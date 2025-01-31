@@ -17,7 +17,7 @@ services:
   # 开发者 1 的 Django 后端
   backend_dev1:
     build:
-      context: ./backend
+      context: /home/zgcc/project/WebApp/backend
       dockerfile: Dockerfile
     container_name: django_backend_zgcc
     environment:
@@ -31,12 +31,12 @@ services:
     networks:
       - dev_network
     volumes:
-      - ./backend:/app
+      - /home/zgcc/project/WebApp/backend:/app
 
   # 开发者 2 的 Django 后端
   backend_dev2:
     build:
-      context: ./backend
+      context: /home/bjx057/project/WebApp/backend
       dockerfile: Dockerfile
     container_name: django_backend_bjx
     environment:
@@ -50,12 +50,12 @@ services:
     networks:
       - dev_network
     volumes:
-      - ./backend:/app
+      - /home/bjx057/project/WebApp/backend:/app
 
   # 开发者 1 的 Vue3 前端
   frontend_dev1:
     build:
-      context: ./frontend
+      context: /home/zgcc/project/WebApp/frontend
       dockerfile: Dockerfile
     container_name: vue_frontend_zgcc
     depends_on:
@@ -63,12 +63,12 @@ services:
     networks:
       - dev_network
     volumes:
-      - ./frontend:/app
+      - /home/zgcc/project/WebApp/frontend:/app
 
   # 开发者 2 的 Vue3 前端
   frontend_dev2:
     build:
-      context: ./frontend
+      context: /home/bjx057/project/WebApp/frontend
       dockerfile: Dockerfile
     container_name: vue_frontend_bjx
     depends_on:
@@ -76,7 +76,7 @@ services:
     networks:
       - dev_network
     volumes:
-      - ./frontend:/app
+      - /home/bjx057/project/WebApp/frontend:/app
 
 volumes:
   db_data:

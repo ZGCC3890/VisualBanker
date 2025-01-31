@@ -10,7 +10,6 @@ Thumbs.db
 .env
 *.env
 *.secret
-*.json
 
 ##########################
 # Vue3 (frontend) 相关忽略
