@@ -1,0 +1,68 @@
+# 全局忽略规则
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.swo
+*.seed
+*.pid
+*.lock
+.env
+*.env
+*.secret
+*.json
+
+##########################
+# Vue3 (frontend) 相关忽略
+##########################
+frontend/node_modules/
+frontend/dist/
+frontend/.npm/
+frontend/.cache/
+frontend/yarn.lock
+frontend/pnpm-lock.yaml
+frontend/.env
+frontend/.env.local
+frontend/.output/
+frontend/.nuxt/
+
+# Vue 构建相关
+frontend/.vite/
+frontend/.output/
+
+# IDE/编辑器配置
+frontend/.vscode/
+frontend/.idea/
+frontend/.editorconfig
+
+##########################
+# Django (backend) 相关忽略
+##########################
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/*.pyd
+backend/*.sqlite3
+backend/*.log
+backend/db.sqlite3
+backend/media/
+backend/staticfiles/
+backend/static/
+backend/.env
+backend/.venv/
+backend/venv/
+backend/env/
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/migrations/__pycache__/
+
+# pip 依赖相关
+backend/Pipfile
+backend/Pipfile.lock
+backend/*.egg-info/
+
+##########################
+# PostgreSQL 相关忽略
+##########################
+backend/*.pgdata
+backend/*.pgwal
