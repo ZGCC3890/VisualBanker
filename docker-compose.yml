@@ -1,7 +1,8 @@
 services:
+  # 共享 PostgreSQL 数据库
   db:
     image: postgres:14
-    container_name: postgres_db
+    container_name: postgres_db_shared
     environment:
       POSTGRES_DB: mydb
       POSTGRES_USER: myuser
@@ -10,12 +11,15 @@ services:
       - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - dev_network
 
-  backend:
+  # 开发者 1 的 Django 后端
+  backend_dev1:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: django_backend
+    container_name: django_backend_zgcc
     environment:
       DB_NAME: mydb
       DB_USER: myuser
@@ -25,17 +29,66 @@ services:
     depends_on:
       - db
     ports:
-      - "127.0.0.1:8000:8000"
+      - "127.0.0.1:8001:8000"  # 开发者 1 访问 8001 端口
+    networks:
+      - dev_network
+    volumes:
+      - ./backend:/app
 
-  frontend:
+  # 开发者 2 的 Django 后端
+  backend_dev2:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: django_backend_bjx
+    environment:
+      DB_NAME: mydb
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+      DB_HOST: db
+      DB_PORT: 5432
+    depends_on:
+      - db
+    ports:
+      - "127.0.0.1:8002:8000"  # 开发者 2 访问 8002 端口
+    networks:
+      - dev_network
+    volumes:
+      - ./backend:/app
+
+  # 开发者 1 的 Vue3 前端
+  frontend_dev1:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: vue_frontend
+    container_name: vue_frontend_zgcc
     depends_on:
-      - backend
+      - backend_dev1
     ports:
-      - "80:80"
+      - "8081:80"  # 开发者 1 访问 8081
+    networks:
+      - dev_network
+    volumes:
+      - ./frontend:/app
+
+  # 开发者 2 的 Vue3 前端
+  frontend_dev2:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: vue_frontend_bjx
+    depends_on:
+      - backend_dev2
+    ports:
+      - "8082:80"  # 开发者 2 访问 8082
+    networks:
+      - dev_network
+    volumes:
+      - ./frontend:/app
 
 volumes:
   db_data:
+
+networks:
+  dev_network:
+    driver: bridge
