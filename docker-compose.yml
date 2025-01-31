@@ -28,8 +28,6 @@ services:
       DB_PORT: 5432
     depends_on:
       - db
-    ports:
-      - "127.0.0.1:8001:8000"  # 开发者 1 访问 8001 端口
     networks:
       - dev_network
     volumes:
@@ -49,8 +47,6 @@ services:
       DB_PORT: 5432
     depends_on:
       - db
-    ports:
-      - "127.0.0.1:8002:8000"  # 开发者 2 访问 8002 端口
     networks:
       - dev_network
     volumes:
@@ -64,8 +60,6 @@ services:
     container_name: vue_frontend_zgcc
     depends_on:
       - backend_dev1
-    ports:
-      - "8081:80"  # 开发者 1 访问 8081
     networks:
       - dev_network
     volumes:
@@ -79,8 +73,6 @@ services:
     container_name: vue_frontend_bjx
     depends_on:
       - backend_dev2
-    ports:
-      - "8082:80"  # 开发者 2 访问 8082
     networks:
       - dev_network
     volumes:
@@ -91,4 +83,5 @@ volumes:
 
 networks:
   dev_network:
+    name: dev_network
     driver: bridge
