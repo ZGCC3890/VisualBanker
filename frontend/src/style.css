@@ -77,3 +77,60 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* 去掉列表前黑点 */
+.no-point-list {
+  list-style-type: none; 
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+}
+
+/* 整体容器 */
+.outer-container {
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px;
+}
+
+/* 结果展示容器 */
+.dashboard {
+  display: inline-block;
+  width: fit-content;
+  margin-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  vertical-align: top;
+  text-align: center;
+}
+
+/* 信息模块容器 */
+.section {
+  display: inline-block;
+  vertical-align: top;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 0 10px;
+  box-sizing: border-box;
+  min-width: 200px;
+}
+
+.data-group {
+  flex: 1;
+  overflow: visible;
+}
+
+table {
+  border-collapse: collapse;
+  table-layout: auto;
+  width: auto;
+  white-space: nowrap;
+}
+
+th, td {
+  padding: 8px;
+  border: 1px solid black;
+  text-align: center;
+  white-space: nowrap;
+}
