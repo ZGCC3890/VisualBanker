@@ -1,75 +1,77 @@
 <template>
-  <div class="container">
+  <div class="outer-container">
     <h2>银行家算法模拟</h2>
     <div>
       <label>客户数 (n):</label>
       <input v-model="n" type="number" min="1" />
+    </div>
+    <div>
       <label>资源种类 (m):</label>
       <input v-model="m" type="number" min="1" />
+    </div>
+    <div>
       <button @click="runBanker">运行算法</button>
     </div>
 
     <!-- 只有在 data 不为空时才渲染结果 -->
-    <div v-if="data">
-      <h3>资源信息</h3>
-      <p>Total Resources: {{ data.total_resources }}</p>
-      <p>Available: {{ data.available }}</p>
+    <div v-if="data" class="dashboard">
+      <!-- 左侧：资源信息 -->
+      <div class="section">
+        <h3>资源信息</h3>
+        <p>Total Resources: {{ data.total_resources }}</p>
+        <p>Available: {{ data.available }}</p>
+      </div>
 
-      <h3>进程信息</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>客户</th>
-            <th>Max</th>
-            <th>Allocation</th>
-            <th>Need</th>
-            <th>Execute Time</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(row, index) in data.max_resources" :key="index">
-            <td>P{{ index }}</td>
-            <td>{{ data.max_resources[index] }}</td>
-            <td>{{ data.allocation[index] }}</td>
-            <td>{{ data.need[index] }}</td>
-            <!-- 执行时间 (execute_time) -->
-            <td>{{ data.execute_time ? data.execute_time[index] : "N/A" }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- 中间：进程信息 -->
+      <div class="section">
+        <h3>进程信息</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>客户</th>
+              <th>Max</th>
+              <th>Allocation</th>
+              <th>Need</th>
+              <th>Execute Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(row, index) in data.max_resources" :key="index">
+              <td>P{{ index }}</td>
+              <td>{{ data.max_resources[index] }}</td>
+              <td>{{ data.allocation[index] }}</td>
+              <td>{{ data.need[index] }}</td>
+              <td>{{ data.execute_time ? data.execute_time[index] : "N/A" }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-      <!-- 安全性显示 -->
-      <h3>安全检查</h3>
-      <p v-if="data.safe">
-        系统处于安全状态
-      </p>
-      <p v-else style="color: red;">
-        系统处于不安全状态！
-      </p>
-
-      <!-- 若 safe = true，则显示安全序列信息 -->
-      <div v-if="data.safe">
-        <p>首个安全序列 (one_safe_sequence): {{ data.one_safe_sequence }}</p>
-        <p>最佳序列 (best_sequence): {{ data.best_sequence }}</p>
-
-        <!-- 显示所有安全序列的总数 -->
-        <p>
-          所有安全序列 (all_safe_sequences): 共计
-          {{ totalSequences }}
-          条
+      <!-- 右侧：安全检查 -->
+      <div class="section">
+        <h3>安全检查</h3>
+        <p v-if="data.safe">
+          系统处于安全状态
+        </p>
+        <p v-else style="color: red;">
+          系统处于不安全状态！
         </p>
 
-        <!-- 只显示最优的 10 条安全序列 (best10Sequences) -->
-        <ul class="no-bullet-list">
-          <li v-for="(item, idx) in best10Sequences" :key="idx">
-            {{ item.seq }} (总执行时间: {{ item.time }})
-          </li>
-        </ul>
+        <div v-if="data.safe">
+          <p>首个安全序列: {{ data.one_safe_sequence }}</p>
+          <p>最佳序列: {{ data.best_sequence }}</p>
+          <p>所有安全序列: 共计 {{ totalSequences }} 条</p>
+
+          <ul class="no-point-list">
+            <li v-for="(item, idx) in best10Sequences" :key="idx">
+              {{ item.seq }} (总执行时间: {{ item.time }})
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
 </template>
-
 
 <script>
 import { ref, computed } from "vue";
@@ -136,21 +138,6 @@ export default {
 .container {
   width: 80%;
   margin: auto;
-  text-align: center;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-table,
-th,
-td {
-  border: 1px solid black;
-}
-th,
-td {
-  padding: 8px;
   text-align: center;
 }
 </style>
