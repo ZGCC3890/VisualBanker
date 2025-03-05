@@ -33,24 +33,24 @@ services:
     volumes:
       - /home/zgcc/project/WebApp/backend:/app
 
-  # 开发者 2 的 Django 后端
-  backend_dev2:
-    build:
-      context: /home/bjx057/project/WebApp/backend
-      dockerfile: Dockerfile
-    container_name: django_backend_bjx
-    environment:
-      DB_NAME: mydb
-      DB_USER: myuser
-      DB_PASSWORD: mypassword
-      DB_HOST: db
-      DB_PORT: 5432
-    depends_on:
-      - db
-    networks:
-      - dev_network
-    volumes:
-      - /home/bjx057/project/WebApp/backend:/app
+  # # 开发者 2 的 Django 后端
+  # backend_dev2:
+  #   build:
+  #     context: /home/bjx057/project/WebApp/backend
+  #     dockerfile: Dockerfile
+  #   container_name: django_backend_bjx
+  #   environment:
+  #     DB_NAME: mydb
+  #     DB_USER: myuser
+  #     DB_PASSWORD: mypassword
+  #     DB_HOST: db
+  #     DB_PORT: 5432
+  #   depends_on:
+  #     - db
+  #   networks:
+  #     - dev_network
+  #   volumes:
+  #     - /home/bjx057/project/WebApp/backend:/app
 
   # 开发者 1 的 Vue3 前端
   frontend_dev1:
@@ -65,18 +65,18 @@ services:
     volumes:
       - /home/zgcc/project/WebApp/frontend:/app
 
-  # 开发者 2 的 Vue3 前端
-  frontend_dev2:
-    build:
-      context: /home/bjx057/project/WebApp/frontend
-      dockerfile: Dockerfile
-    container_name: vue_frontend_bjx
-    depends_on:
-      - backend_dev2
-    networks:
-      - dev_network
-    volumes:
-      - /home/bjx057/project/WebApp/frontend:/app
+  # # 开发者 2 的 Vue3 前端
+  # frontend_dev2:
+  #   build:
+  #     context: /home/bjx057/project/WebApp/frontend
+  #     dockerfile: Dockerfile
+  #   container_name: vue_frontend_bjx
+  #   depends_on:
+  #     - backend_dev2
+  #   networks:
+  #     - dev_network
+  #   volumes:
+  #     - /home/bjx057/project/WebApp/frontend:/app
 
 volumes:
   db_data:

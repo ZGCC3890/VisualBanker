@@ -9,8 +9,10 @@
       <button @click="runBanker">运行算法</button>
     </div>
 
+    <!-- 只有在 data 不为空时才渲染结果 -->
     <div v-if="data">
       <h3>资源信息</h3>
+      <p>Total Resources: {{ data.total_resources }}</p>
       <p>Available: {{ data.available }}</p>
 
       <h3>进程信息</h3>
@@ -21,47 +23,114 @@
             <th>Max</th>
             <th>Allocation</th>
             <th>Need</th>
+            <th>Execute Time</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(row, index) in data.max_resources" :key="index">
             <td>P{{ index }}</td>
-            <td>{{ row }}</td>
+            <td>{{ data.max_resources[index] }}</td>
             <td>{{ data.allocation[index] }}</td>
             <td>{{ data.need[index] }}</td>
+            <!-- 执行时间 (execute_time) -->
+            <td>{{ data.execute_time ? data.execute_time[index] : "N/A" }}</td>
           </tr>
         </tbody>
       </table>
 
+      <!-- 安全性显示 -->
       <h3>安全检查</h3>
-      <p v-if="data.safe">安全序列: {{ data.sequence }}</p>
-      <p v-else style="color: red;">系统处于不安全状态！</p>
+      <p v-if="data.safe">
+        系统处于安全状态
+      </p>
+      <p v-else style="color: red;">
+        系统处于不安全状态！
+      </p>
+
+      <!-- 若 safe = true，则显示安全序列信息 -->
+      <div v-if="data.safe">
+        <p>首个安全序列 (one_safe_sequence): {{ data.one_safe_sequence }}</p>
+        <p>最佳序列 (best_sequence): {{ data.best_sequence }}</p>
+
+        <!-- 显示所有安全序列的总数 -->
+        <p>
+          所有安全序列 (all_safe_sequences): 共计
+          {{ totalSequences }}
+          条
+        </p>
+
+        <!-- 只显示最优的 10 条安全序列 (best10Sequences) -->
+        <ul class="no-bullet-list">
+          <li v-for="(item, idx) in best10Sequences" :key="idx">
+            {{ item.seq }} (总执行时间: {{ item.time }})
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 
+
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { fetchBankerData } from "../api/banker";
 
 export default {
   setup() {
-    const n = ref(7);
-    const m = ref(4);
+    const n = ref(5);
+    const m = ref(3);
     const data = ref(null);
 
     const runBanker = async () => {
       try {
         data.value = await fetchBankerData(n.value, m.value);
       } catch (error) {
-        console.error("请求失败", error);
+        console.error("请求失败：", error);
       }
     };
 
-    return { n, m, data, runBanker };
+    // 所有安全序列总数
+    const totalSequences = computed(() => {
+      if (!data.value || !data.value.all_safe_sequences) {
+        return 0;
+      }
+      return data.value.all_safe_sequences.length;
+    });
+
+    // 只取“执行时间最短”的前 10 条安全序列
+    const best10Sequences = computed(() => {
+      if (
+        !data.value ||
+        !data.value.all_safe_sequences ||
+        !data.value.execute_time
+      ) {
+        return [];
+      }
+      // 对所有安全序列计算总执行时间并排序
+      const sequencesWithTime = data.value.all_safe_sequences.map((seq) => {
+        const time = seq.reduce((acc, procIndex) => {
+          return acc + data.value.execute_time[procIndex];
+        }, 0);
+        return { seq, time };
+      });
+      // 按总执行时间从小到大排序
+      sequencesWithTime.sort((a, b) => a.time - b.time);
+      // 只取前 10 条
+      return sequencesWithTime.slice(0, 10);
+    });
+
+    return {
+      n,
+      m,
+      data,
+      runBanker,
+      totalSequences,
+      best10Sequences
+    };
   },
 };
 </script>
+
 
 <style scoped>
 .container {
@@ -74,10 +143,13 @@ table {
   border-collapse: collapse;
   margin-top: 20px;
 }
-table, th, td {
+table,
+th,
+td {
   border: 1px solid black;
 }
-th, td {
+th,
+td {
   padding: 8px;
   text-align: center;
 }
