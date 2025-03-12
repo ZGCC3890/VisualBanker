@@ -134,7 +134,7 @@ def banker_algorithm(request):
                     work[k] += allocation[i][k]
                 utilization = max(1 - (work[k] / total_resources[k]) for k in range(m))
                 max_utilization = max(max_utilization, utilization)
-            return max_utilization * 100  # 转换为百分比
+            return max_utilization * 100
 
         # 先检查是否有安全序列
         safe_once, first_seq = is_safe_once()

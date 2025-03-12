@@ -1,12 +1,12 @@
 <template>
   <div class="outer-container">
-    <h2>银行家算法模拟</h2>
+    <h2>云游戏算力分配</h2>
     <div>
       <label>客户数 (n):</label>
       <input v-model="n" type="number" min="1" />
     </div>
     <div>
-      <label>资源种类 (m):</label>
+      <label>核心种类 (m):</label>
       <input v-model="m" type="number" min="1" />
     </div>
     <div>
