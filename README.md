@@ -13,7 +13,7 @@
 - [附录](#附录)
 
 ## 架构
-本项目由 Docker 完全容器化管理，共用数据库 PostgreSQL 容器，前端 Vue3 和后端 Django 使用不同容器开发，流量由 Nginx 容器统一代理。各容器通过 docker-compose 编排，基本结构如下：
+本项目由 Docker 完全容器化管理，共用数据库 PostgreSQL 容器，前端 Vue3 和后端 Django 使用不同容器开发，流量由 Nginx 容器统一代理dev_network容器网络。各容器通过 docker-compose 编排，基本结构如下：
 
 - **db**: PostgreSQL 容器 (共享数据库)
 - **backend_dev1**: Django 后端容器
@@ -45,7 +45,7 @@
 - 一键模拟银行家算法的资源分配场景
 - 实时生成每个“客户(进程)”的 Max、Allocation、Need 等矩阵
 - 自动检测系统是否安全，并输出安全序列
-- 若有多条安全序列，可查看并对比执行时间，展示最优序列
+- 若有多条安全序列，可查看并对比资源利用率，展示最优序列
 
 ## 前端实现
 - 使用 **Vue3** 编写，核心页面在 `VisualBanker/frontend/src/components/Banker.vue` 组件中。
@@ -55,7 +55,7 @@
   `total_resources / available`  
   `max_resources / allocation / need`  
   `execute_time`(执行所需时间)  
-  安全检查结果 (safe 或不安全)  
+  安全检查结果 (安全 或 不安全)  
   安全序列 (one_safe_sequence, all_safe_sequences, best_sequence)  
 
 ## 后端实现
@@ -64,7 +64,7 @@
   **设置总资源量** `total_resources`
   **随机分配**已占用资源 `allocation` 并计算当前 `available`
   **检查安全性**首先通过 `is_safe_once()` 方法进行初步安全状态判定；若安全则继续回溯搜索所有安全序列
-  **计算执行时间**并选出最优序列
+  **计算资源利用率**并选出最优序列
 - 最终通过 JSON 格式返回数据给前端，供可视化渲染。
 
 ## 使用方法
@@ -72,11 +72,14 @@
    根据前端项目启动后返回的地址，或者直接访问 Nginx 暴露的 80 端口。
 
 2. **输入参数**  
-   在页面输入“客户数 (n)”和“资源种类 (m)”后点击“运行算法”。
+   在页面输入“客户数 (n)”和“资源种类 (m)”后点击“运行算法”，默认`n = 5` `m = 3`。
 
 3. **查看结果**  
-   - 若系统处于安全状态，会显示安全序列、最优序列以及前 10 条“总执行时间”最短的序列。
+   - 若系统处于安全状态，会显示安全序列、最优序列以及前 10 条“资源利用率”最高的序列。
    - 若系统不安全，则会有红字提示。
+   ```
+   资源利用率 = max[(1 - 当前分配资源量 / 总资源量) * 100%]
+   ```
 
 ## 接口说明
 - **URL**: `/api/banker` (示例，实际请以路由配置为准)
@@ -150,7 +153,7 @@ services:
   # # 开发者 2 的 Django 后端
   # backend_dev2:
   #   build:
-  #     context: /home/bjx057/project/VisualBanker/backend
+  #     context: /home/user2/project/VisualBanker/backend
   #     dockerfile: Dockerfile
   #   container_name: django_backend_bjx
   #   environment:
@@ -164,7 +167,7 @@ services:
   #   networks:
   #     - dev_network
   #   volumes:
-  #     - /home/bjx057/project/VisualBanker/backend:/app
+  #     - /home/user2/project/VisualBanker/backend:/app
 
   # 开发者 1 的 Vue3 前端
   frontend_dev1:
@@ -182,7 +185,7 @@ services:
   # # 开发者 2 的 Vue3 前端
   # frontend_dev2:
   #   build:
-  #     context: /home/bjx057/project/VisualBanker/frontend
+  #     context: /home/user2/project/VisualBanker/frontend
   #     dockerfile: Dockerfile
   #   container_name: vue_frontend_bjx
   #   depends_on:
@@ -190,7 +193,7 @@ services:
   #   networks:
   #     - dev_network
   #   volumes:
-  #     - /home/bjx057/project/VisualBanker/frontend:/app
+  #     - /home/user2/project/VisualBanker/frontend:/app
 
 volumes:
   db_data:
