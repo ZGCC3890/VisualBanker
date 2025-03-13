@@ -45,15 +45,14 @@ def banker_algorithm(request):
         # 3. 随机生成已分配矩阵 Allocation，并计算 Available
         # --------------------------
         allocation = [[0]*m for _ in range(n)]
-        # 因为要保证分配不超过 total_resources
-        # 我们对每种资源做独立分配
+        # 因为要保证分配不超过 total_resources，对每种资源做独立分配
         available = total_resources[:]
         for j in range(m):
             remain = available[j]
             for i in range(n):
                 if remain <= 0:
                     break
-                # 当前客户 i 能分配的最大资源不应超过其最大需求
+                # 当前客户 i 能分配的最大资源不超过其最大需求
                 max_alloc = min(max_resources[i][j], remain)
                 # 在 [0, max_alloc] 区间随机分配
                 alloc = random.randint(0, max_alloc)
@@ -104,11 +103,11 @@ def banker_algorithm(request):
                     return
                 for i in range(n):
                     if (not used[i]) and all(need[i][k] <= work_snapshot[k] for k in range(m)):
-                        # 试着“执行”进程 i
+                        # “执行”进程 i
                         used[i] = True
                         # 临时保存旧的 work
                         old_work = work_snapshot[:]
-                        # 分配给 i
+                        # “分配”给 i
                         for k in range(m):
                             work_snapshot[k] += allocation[i][k]
                         seq.append(i)
@@ -125,27 +124,28 @@ def banker_algorithm(request):
             return results
 
         # --------------------------
-        # 6. 计算执行时间并对所有安全序列按“执行效率”排序
+        # 6. 计算资源利用率
         # --------------------------
-        # 这里的执行效率可自行定义，比如：假设是顺序执行所有进程，总时间就是各进程时间之和
-        # 如果要更精细（如同时占用资源并行执行等），需更复杂的模拟，这里只做示例。
-        def calc_total_time(sequence):
-            # 简单相加
-            return sum(execute_time[i] for i in sequence)
+        def calc_resource_utilization(sequence):
+            work = available[:]
+            max_utilization = 0
+            for i in sequence:
+                for k in range(m):
+                    work[k] += allocation[i][k]
+                utilization = max(1 - (work[k] / total_resources[k]) for k in range(m))
+                max_utilization = max(max_utilization, utilization)
+            return max_utilization * 100
 
         # 先检查是否有安全序列
         safe_once, first_seq = is_safe_once()
         all_seqs = []
         best_seq = []
         if safe_once:
-            # 找所有安全序列
             all_seqs = find_all_safe_sequences()
-            # 计算时间并排序
-            seq_with_time = [(seq, calc_total_time(seq)) for seq in all_seqs]
-            seq_with_time.sort(key=lambda x: x[1])  # 按总时间升序
-            best_seq = seq_with_time[0][0]  # 取耗时最短的序列
+            seq_with_utilization = [(seq, calc_resource_utilization(seq)) for seq in all_seqs]
+            seq_with_utilization.sort(key=lambda x: x[1], reverse=True)  # 按资源利用率降序排序
+            best_seq = seq_with_utilization[0][0]  # 取资源利用率最高的序列
         else:
-            # 没有安全序列时，all_seqs 依然是空
             pass
 
         return JsonResponse({
@@ -157,7 +157,8 @@ def banker_algorithm(request):
             "execute_time": execute_time,
             "safe": safe_once,
             "one_safe_sequence": first_seq,
-            "all_safe_sequences": all_seqs,  # 可能包含多条顺序
-            "best_sequence": best_seq
+            "all_safe_sequences": all_seqs,
+            "best_sequence": best_seq,
+            "utilization_per_sequence": [calc_resource_utilization(seq) for seq in all_seqs]
         }, safe=False)
     return JsonResponse({"error": "Invalid request"}, status=400)

@@ -1,12 +1,12 @@
 <template>
   <div class="outer-container">
-    <h2>银行家算法模拟</h2>
+    <h2>云游戏算力分配</h2>
     <div>
       <label>客户数 (n):</label>
       <input v-model="n" type="number" min="1" />
     </div>
     <div>
-      <label>资源种类 (m):</label>
+      <label>核心种类 (m):</label>
       <input v-model="m" type="number" min="1" />
     </div>
     <div>
@@ -64,7 +64,7 @@
 
           <ul class="no-point-list">
             <li v-for="(item, idx) in best10Sequences" :key="idx">
-              {{ item.seq }} (总执行时间: {{ item.time }})
+              {{ item.seq }} (资源利用率: {{ item.utilization.toFixed(2) }}%)
             </li>
           </ul>
         </div>
@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed , onMounted} from "vue";
 import { fetchBankerData } from "../api/banker";
 
 export default {
@@ -82,6 +82,23 @@ export default {
     const n = ref(5);
     const m = ref(3);
     const data = ref(null);
+
+    const BASE_URL = import.meta.env.BASE_URL;
+
+    const backgroundImages = [
+      `${BASE_URL}images/bg1.png`,
+      `${BASE_URL}images/bg2.png`,
+      `${BASE_URL}images/bg3.png`,
+    ];
+
+    onMounted(() => {
+      const randomIndex = Math.floor(Math.random() * backgroundImages.length);
+      const selectedImage = backgroundImages[randomIndex];
+      console.log("Selected background:", selectedImage);
+
+      // **直接修改 body 背景**
+      document.body.style.backgroundImage = `url(${selectedImage})`;
+    });
 
     const runBanker = async () => {
       try {
@@ -99,26 +116,18 @@ export default {
       return data.value.all_safe_sequences.length;
     });
 
-    // 只取“执行时间最短”的前 10 条安全序列
+    // 取资源利用率最高的前 10 条安全序列
     const best10Sequences = computed(() => {
-      if (
-        !data.value ||
-        !data.value.all_safe_sequences ||
-        !data.value.execute_time
-      ) {
+      if (!data.value || !data.value.all_safe_sequences || !data.value.utilization_per_sequence) {
         return [];
       }
-      // 对所有安全序列计算总执行时间并排序
-      const sequencesWithTime = data.value.all_safe_sequences.map((seq) => {
-        const time = seq.reduce((acc, procIndex) => {
-          return acc + data.value.execute_time[procIndex];
-        }, 0);
-        return { seq, time };
+      // 组合安全序列和资源利用率，并按资源利用率降序排序
+      const sequencesWithUtilization = data.value.all_safe_sequences.map((seq, index) => {
+        return { seq, utilization: data.value.utilization_per_sequence[index] };
       });
-      // 按总执行时间从小到大排序
-      sequencesWithTime.sort((a, b) => a.time - b.time);
-      // 只取前 10 条
-      return sequencesWithTime.slice(0, 10);
+
+      sequencesWithUtilization.sort((a, b) => b.utilization - a.utilization); // 资源利用率降序排序
+      return sequencesWithUtilization.slice(0, 10); // 只取前 10 条
     });
 
     return {
