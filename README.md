@@ -116,93 +116,56 @@
 ## 附录
 ### nginx/nginx.conf
 ```
-services:
-  # 共享 PostgreSQL 数据库
-  db:
-    image: postgres:14
-    container_name: postgres_db_shared
-    environment:
-      POSTGRES_DB: mydb
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    networks:
-      - dev_network
+events {
+    worker_connections 1024;
+}
 
-  # 开发者 1 的 Django 后端
-  backend_dev1:
-    build:
-      context: /home/zgcc/project/VisualBanker/backend
-      dockerfile: Dockerfile
-    container_name: django_backend_zgcc
-    environment:
-      DB_NAME: mydb
-      DB_USER: myuser
-      DB_PASSWORD: mypassword
-      DB_HOST: db
-      DB_PORT: 5432
-    depends_on:
-      - db
-    networks:
-      - dev_network
-    volumes:
-      - /home/zgcc/project/VisualBanker/backend:/app
+http {
+    server {
+        listen 80;
+        server_name zgcc.online;
 
-  # # 开发者 2 的 Django 后端
-  # backend_dev2:
-  #   build:
-  #     context: /home/user2/project/VisualBanker/backend
-  #     dockerfile: Dockerfile
-  #   container_name: django_backend_bjx
-  #   environment:
-  #     DB_NAME: mydb
-  #     DB_USER: myuser
-  #     DB_PASSWORD: mypassword
-  #     DB_HOST: db
-  #     DB_PORT: 5432
-  #   depends_on:
-  #     - db
-  #   networks:
-  #     - dev_network
-  #   volumes:
-  #     - /home/user2/project/VisualBanker/backend:/app
+        # 开发者 1 的前端
+        location /zgcc/ {
+            rewrite ^/zgcc/(.*)$ /$1 break;
+            proxy_pass http://vue_frontend_zgcc:80; 
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
 
-  # 开发者 1 的 Vue3 前端
-  frontend_dev1:
-    build:
-      context: /home/zgcc/project/VisualBanker/frontend
-      dockerfile: Dockerfile
-    container_name: vue_frontend_zgcc
-    depends_on:
-      - backend_dev1
-    networks:
-      - dev_network
-    volumes:
-      - /home/zgcc/project/VisualBanker/frontend:/app
+        # 开发者 1 的后端（通过 Docker 网络访问）
+        location /zgcc/api/ {
+            rewrite ^/zgcc/api(/.*)$ $1 break;
+            proxy_pass http://django_backend_zgcc:8000/;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
 
-  # # 开发者 2 的 Vue3 前端
-  # frontend_dev2:
-  #   build:
-  #     context: /home/user2/project/VisualBanker/frontend
-  #     dockerfile: Dockerfile
-  #   container_name: vue_frontend_bjx
-  #   depends_on:
-  #     - backend_dev2
-  #   networks:
-  #     - dev_network
-  #   volumes:
-  #     - /home/user2/project/VisualBanker/frontend:/app
+        # # 开发者 2 的前端
+        # location /bjx/ {
+        #     rewrite ^/bjx/(.*)$ /$1 break;
+        #     proxy_pass http://vue_frontend_bjx:80; 
+        #     proxy_set_header Host $host;
+        #     proxy_set_header X-Real-IP $remote_addr;
+        #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        #     proxy_set_header X-Forwarded-Proto $scheme;
+        # }
 
-volumes:
-  db_data:
-
-networks:
-  dev_network:
-    name: dev_network
-    driver: bridge
+        # # 开发者 2 的后端（通过 Docker 网络访问）
+        # location /bjx/api/ {
+        #     rewrite ^/bjx/api(/.*)$ $1 break;
+        #     proxy_pass http://django_backend_bjx:8000/;
+        #     proxy_set_header Host $host;
+        #     proxy_set_header X-Real-IP $remote_addr;
+        #     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        #     proxy_set_header X-Forwarded-Proto $scheme;
+        # }
+    }
+}
 ```
 ### nginx/docker-compose.yml
 ```
