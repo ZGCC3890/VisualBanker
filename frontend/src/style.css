@@ -28,6 +28,9 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 h1 {
@@ -91,6 +94,7 @@ button:focus-visible {
   margin: 0 auto;
   text-align: center;
   padding: 20px;
+  width: 80%;
 }
 
 /* 结果展示容器 */

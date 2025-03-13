@@ -46,6 +46,7 @@
 - 实时生成每个“客户(进程)”的 Max、Allocation、Need 等矩阵
 - 自动检测系统是否安全，并输出安全序列
 - 若有多条安全序列，可查看并对比资源利用率，展示最优序列
+- 从多个背景图片中随机选取一个充满页面背景
 
 ## 前端实现
 - 使用 **Vue3** 编写，核心页面在 `VisualBanker/frontend/src/components/Banker.vue` 组件中。

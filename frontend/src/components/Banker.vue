@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed , onMounted} from "vue";
 import { fetchBankerData } from "../api/banker";
 
 export default {
@@ -82,6 +82,23 @@ export default {
     const n = ref(5);
     const m = ref(3);
     const data = ref(null);
+
+    const BASE_URL = import.meta.env.BASE_URL;
+
+    const backgroundImages = [
+      `${BASE_URL}images/bg1.png`,
+      `${BASE_URL}images/bg2.png`,
+      `${BASE_URL}images/bg3.png`,
+    ];
+
+    onMounted(() => {
+      const randomIndex = Math.floor(Math.random() * backgroundImages.length);
+      const selectedImage = backgroundImages[randomIndex];
+      console.log("Selected background:", selectedImage);
+
+      // **直接修改 body 背景**
+      document.body.style.backgroundImage = `url(${selectedImage})`;
+    });
 
     const runBanker = async () => {
       try {

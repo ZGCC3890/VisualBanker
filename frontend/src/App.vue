@@ -1,8 +1,8 @@
 <template>
-  <div id="app">
-    <h1>银行家算法可视化</h1>
+  <!-- <div id="app"> -->
+    <!-- <h1>银行家算法可视化</h1> -->
     <Banker />
-  </div>
+  <!-- </div> -->
 </template>
 
 <script>
