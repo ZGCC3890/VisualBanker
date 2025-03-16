@@ -127,7 +127,7 @@ export default {
       });
 
       sequencesWithUtilization.sort((a, b) => b.utilization - a.utilization); // 资源利用率降序排序
-      return sequencesWithUtilization.slice(0, 10); // 只取前 10 条
+      return sequencesWithUtilization.slice(0, 10);
     });
 
     return {
