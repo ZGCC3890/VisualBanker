@@ -85,3 +85,4 @@ networks:
   dev_network:
     name: dev_network
     driver: bridge
+    external: true

@@ -31,7 +31,7 @@ def banker_algorithm(request):
             for j in range(m):
                 sum_demand_per_resource[j] += max_resources[i][j]
 
-        # 用一个因子，随机决定总资源在 sum_demand_per_resource 附近上下浮动
+        # 总资源在 sum_demand_per_resource 附近上下浮动(0.6 - 1.4)
         total_resources = []
         for j in range(m):
             low = int(0.6 * sum_demand_per_resource[j])
@@ -131,9 +131,12 @@ def banker_algorithm(request):
             max_utilization = 0
             for i in sequence:
                 for k in range(m):
-                    work[k] += allocation[i][k]
-                utilization = max(1 - (work[k] / total_resources[k]) for k in range(m))
+                    work[k] -= need[i][k]
+                utilization = 1 - (sum(work) / sum(total_resources))
                 max_utilization = max(max_utilization, utilization)
+                for k in range(m):
+                    work[k] += need[i][k]
+                    work[k] += allocation[i][k]
             return max_utilization * 100
 
         # 先检查是否有安全序列

@@ -3,14 +3,15 @@
     <h2>云游戏算力分配</h2>
     <div>
       <label>客户数 (n):</label>
-      <input v-model="n" type="number" min="1" />
+      <input v-model.number="n" type="number" min="1" />
     </div>
     <div>
       <label>核心种类 (m):</label>
-      <input v-model="m" type="number" min="1" />
+      <input v-model.number="m" type="number" min="1" />
     </div>
     <div>
-      <button @click="runBanker">运行算法</button>
+      <!-- 输入合法性检查通过再调用runBanker -->
+      <button @click="validation">运行算法</button>
     </div>
 
     <!-- 只有在 data 不为空时才渲染结果 -->
@@ -105,7 +106,17 @@ export default {
         data.value = await fetchBankerData(n.value, m.value);
       } catch (error) {
         console.error("请求失败：", error);
+        alert("网络请求失败，请稍后重试");
       }
+    };
+
+    const validation = () => {
+      // 检查 n 和 m 是否为大于0的数字
+      if (!n.value || n.value <= 0 || !m.value || m.value <= 0) {
+        alert("非法输入，请输入大于0的数字");
+        return;
+      }
+      runBanker();
     };
 
     // 所有安全序列总数
@@ -127,14 +138,14 @@ export default {
       });
 
       sequencesWithUtilization.sort((a, b) => b.utilization - a.utilization); // 资源利用率降序排序
-      return sequencesWithUtilization.slice(0, 10); // 只取前 10 条
+      return sequencesWithUtilization.slice(0, 10);
     });
 
     return {
       n,
       m,
       data,
-      runBanker,
+      validation,
       totalSequences,
       best10Sequences
     };
