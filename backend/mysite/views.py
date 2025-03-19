@@ -31,7 +31,7 @@ def banker_algorithm(request):
             for j in range(m):
                 sum_demand_per_resource[j] += max_resources[i][j]
 
-        # 用一个因子，随机决定总资源在 sum_demand_per_resource 附近上下浮动
+        # 总资源在 sum_demand_per_resource 附近上下浮动(0.6 - 1.4)
         total_resources = []
         for j in range(m):
             low = int(0.6 * sum_demand_per_resource[j])

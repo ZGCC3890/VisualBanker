@@ -10,6 +10,7 @@
       <input v-model.number="m" type="number" min="1" />
     </div>
     <div>
+      <!-- 输入合法性检查通过再调用runBanker -->
       <button @click="validation">运行算法</button>
     </div>
 
@@ -105,6 +106,7 @@ export default {
         data.value = await fetchBankerData(n.value, m.value);
       } catch (error) {
         console.error("请求失败：", error);
+        alert("网络请求失败，请稍后重试");
       }
     };
 
